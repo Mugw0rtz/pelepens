@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Philippines Cultural Insights Map</title>
+  <!-- Leaflet CSS -->
+  <link rel="icon" type="image/png" href="art/p.png">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    /* Styling for map and sidebar */
+    body { margin: 0; display: flex; font-family: Arial, sans-serif; }
+    #map { height: 100vh; width: 80%; }
+    #sidebar {
+      width: 20%; 
+      height: 100vh; 
+      background-color: #f4f4f4;
+      overflow-y: auto;
+      padding: 1rem;
+      box-shadow: 2px 0px 5px rgba(0,0,0,0.1);
+    }
+    h2 { text-align: center; }
+    .category-title { margin-top: 1rem; font-size: 1.2em; }
+    .location-link {
+      display: block;
+      cursor: pointer;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      margin-bottom: 0.8rem; /* Adds space between links */
+      border-radius: 5px;
+      text-decoration: none;
+      color: inherit;
+      transition: background-color 0.3s ease;
+    }
+    .location-link:hover {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <h2>Cultural Insights</h2>
+    <div class="category-title">Traditions and Festivals</div>
+    <div id="festival-list"></div>
+    <div class="category-title">Languages and Dialects</div>
+    <div id="language-list"></div>
+  </div>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Initialize the map
+    const map = L.map('map').setView([12.8797, 121.7740], 6);
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Icon styles
+    const festivalIcon = L.icon({
+      iconUrl: 'art/gps blue.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34]
+    });
+
+    const languageIcon = L.icon({
+      iconUrl: 'art/location.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34]
+    });
+
+    // Data for Festivals with URLs for more information
+    const festivals = [
+      { 
+        name: "Sinulog Festival", 
+        coords: [10.3157, 123.8854], 
+        description: "Cebu City’s celebration honoring the Santo Niño, featuring traditional dances.", 
+        image: "art/sinulog.webp",
+        url: "https://www.sinulog.ph"  // Link to external site
+      },
+      { 
+        name: "Ati-Atihan Festival", 
+        coords: [11.7061, 122.3634], 
+        description: "A lively festival in Aklan celebrating both religious and indigenous heritage.", 
+        image: "art/Atiatihan.webp",
+        url: "https://www.aklan.gov.ph/ati-atihan-festival"  // Link to external site
+      },
+      { 
+        name: "Pahiyas Festival", 
+        coords: [14.1151, 121.5513], 
+        description: "A colorful harvest festival in Lucban, Quezon, showcasing decorated houses and fresh produce.", 
+        image: "art/pahiyas.jpg",
+        url: "https://www.pahiyasfestival.com"  // Link to external site
+      },
+      { 
+        name: "Panagbenga Festival", 
+        coords: [16.4023, 120.596], 
+        description: "The flower festival in Baguio City celebrating floral blooms and culture.", 
+        image: "art/panagbenga.png",
+        url: "https://www.panagbengaflowerfestival.com"  // Link to external site
+      },
+      { 
+        name: "Kadayawan Festival", 
+        coords: [7.1907, 125.4553], 
+        description: "Davao City’s festival celebrating ethnic diversity and the bountiful harvest.", 
+        image: "art/kadayawan.webp",
+        url: "https://www.davaocity.gov.ph/kadayawan-festival"  // Link to external site
+      },
+      { 
+        name: "Masskara Festival", 
+        coords: [10.640739, 122.968956], 
+        description: "The MassKara Festival is a vibrant annual celebration in Bacolod City.", 
+        image: "art/masskara.jpg",
+        url: "https://www.masskarafestival.com"  // Link to external site
+      }
+    ];
+
+    // Populate the map with festival markers
+    const festivalList = document.getElementById('festival-list');
+    festivals.forEach((festival) => {
+      const marker = L.marker(festival.coords, { icon: festivalIcon }).addTo(map);
+      marker.bindPopup(`
+        <h3>${festival.name}</h3>
+        <p>${festival.description}</p>
+        <img src="${festival.image}" alt="${festival.name}" style="width:100%;"><br>
+        <a href="${festival.url}" target="_blank" style="color:blue; text-decoration:underline;">
+          Learn more about ${festival.name}
+        </a>
+      `);
+
+      // Sidebar link for each festival
+      const festivalLink = document.createElement('a');
+      festivalLink.className = 'location-link';
+      festivalLink.href = `#`;
+      festivalLink.innerText = festival.name;
+      festivalLink.onclick = (e) => {
+        e.preventDefault();
+        map.flyTo(festival.coords, 8, { duration: 1.5 });
+        marker.openPopup();
+      };
+      festivalList.appendChild(festivalLink);
+    });
+
+    // Data for Languages
+    const languages = [
+      { name: "Tagalog", coords: [14.5995, 120.9842], description: "The basis of Filipino, the national language, widely spoken across the country." },
+      { name: "Cebuano", coords: [10.3157, 123.8854], description: "Predominantly spoken in Cebu, Bohol, and parts of Mindanao." },
+      { name: "Ilocano", coords: [17.4094, 120.6217], description: "Commonly spoken in the northern regions, particularly in Ilocos." },
+      { name: "Hiligaynon (Ilonggo)", coords: [10.7202, 122.5621], description: "Predominantly spoken in Iloilo, Negros Occidental, and parts of the Visayas." },
+      { name: "Bicolano", coords: [13.3333, 123.3333], description: "Used in the Bicol region with various dialects across provinces." },
+      { name: "Waray", coords: [11.2444, 125.0046], description: "Spoken in Samar and parts of Leyte in Eastern Visayas." },
+      { name: "Chavacano", coords: [6.9214, 122.079], description: "A Spanish-based creole language spoken in Zamboanga." },
+      { name: "Kapampangan", coords: [15.0794, 120.6199], description: "Primarily spoken in Pampanga and Tarlac." }
+    ];
+
+    // Populate the map with language markers
+    const languageList = document.getElementById('language-list');
+    languages.forEach((language) => {
+      const marker = L.marker(language.coords, { icon: languageIcon }).addTo(map);
+      marker.bindPopup(`
+        <h3>${language.name}</h3>
+        <p>${language.description}</p>
+      `);
+
+      // Sidebar link for each language
+      const languageLink = document.createElement('a');
+      languageLink.className = 'location-link';
+      languageLink.href = `#`;
+      languageLink.innerText = language.name;
+      languageLink.onclick = (e) => {
+        e.preventDefault();
+        map.flyTo(language.coords, 8, { duration: 1.5 });
+        marker.openPopup();
+      };
+      languageList.appendChild(languageLink);
+    });
+  </script>
+</body>
+</html>
